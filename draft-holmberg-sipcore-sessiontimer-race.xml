@@ -12,8 +12,8 @@
 <?rfc strict="yes" ?>
 <rfc ipr="trust200902" category="std" docName="draft-holmberg-sipcore-sessiontimer-race-00" obsoletes="" updates="4028" submissionType="IETF" xml:lang="en">
   <front>
-    <title abbrev="Content-ID in SIP">
-      Content-ID header field in Session Initiation Protocol (SIP)
+    <title abbrev="Session timer glare">
+      Session Initiation Protocol (SIP) Session Timer Glare Handling
     </title>
       <author initials="C.H." surname="Holmberg" fullname="Christer Holmberg">
       <organization>Ericsson</organization>
