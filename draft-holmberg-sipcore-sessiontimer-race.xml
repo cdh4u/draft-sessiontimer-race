@@ -27,23 +27,14 @@
         <email>christer.holmberg@ericsson.com</email>
       </address>
     </author>
-    <author initials="I.S." surname="Sedlacek" fullname="Ivo Sedlacek">
-      <organization>Ericsson</organization>
-      <address>
-        <postal>
-          <street>Sokolovska 79</street>
-          <code>18600</code>
-          <city>Praha</city>
-          <country>Czech Republic</country>
-        </postal>
-        <email>ivo.sedlacek@ericsson.com</email>
-      </address>
-    </author>
-
+  
     <date year="2017"/>
     <area>Transport</area>
     <workgroup>SIPCORE Working Group</workgroup>
     <keyword>SIP</keyword>
+    <keyword>session timer</keyword>
+    <keyword>Session-Expires</keyword>
+    <keyword>491</keyword>
     <abstract>
       <t>
         This document updates RFC 4028, by clarifying the procedures for negotiating usage of the 
