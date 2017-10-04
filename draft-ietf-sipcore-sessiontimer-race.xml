@@ -1,0 +1,289 @@
+<?xml version="1.0" encoding="windows-1252"?>
+<!DOCTYPE rfc SYSTEM "rfc2629.dtd" [
+<!ENTITY RFC0822 SYSTEM "http://xml.resource.org/public/rfc/bibxml/reference.RFC.2119.xml">
+<!ENTITY RFC3261 SYSTEM "http://xml.resource.org/public/rfc/bibxml/reference.RFC.3261.xml">
+<!ENTITY RFC3311 SYSTEM "http://xml.resource.org/public/rfc/bibxml/reference.RFC.3261.xml">
+<!ENTITY RFC4028 SYSTEM "http://xml.resource.org/public/rfc/bibxml/reference.RFC.4028.xml">
+]>
+<?rfc toc="yes" ?>
+<?rfc compact="yes" ?>
+<?rfc subcompact="yes" ?>
+<?rfc sortrefs="no" ?>
+<?rfc strict="yes" ?>
+<rfc ipr="trust200902" category="std" docName="draft-ietf-sipcore-sessiontimer-race-00" obsoletes="" updates="4028" submissionType="IETF" xml:lang="en">
+  <front>
+    <title abbrev="Session timer glare">
+      Session Initiation Protocol (SIP) Session Timer Glare Handling
+    </title>
+      <author initials="C.H." surname="Holmberg" fullname="Christer Holmberg">
+      <organization>Ericsson</organization>
+      <address>
+        <postal>
+          <street>Hirsalantie 11</street>
+          <code>02420</code>
+          <city>Jorvas</city>
+          <country>Finland</country>
+        </postal>
+        <email>christer.holmberg@ericsson.com</email>
+      </address>
+    </author>
+  
+    <date year="2017"/>
+    <area>Transport</area>
+    <workgroup>SIPCORE Working Group</workgroup>
+    <keyword>SIP</keyword>
+    <keyword>session timer</keyword>
+    <keyword>Session-Expires</keyword>
+    <keyword>491</keyword>
+    <abstract>
+      <t>
+        This document updates RFC 4028, by clarifying the procedures for negotiating usage of the 
+        Session Initiation Protocol (SIP) session timer mechansim, in order to avoid a race condition 
+        where both endpoints trigger simultaneous negotiations.
+      </t>
+    </abstract>
+  </front>
+
+  <middle>
+    <section title="Introduction" toc="default">
+      <t>
+        <xref target="RFC4028"></xref> defines a mechanism, where periodic SIP requests are sent
+        in order to allow SIP user agents and proxies to determine whether a SIP session is
+        still active. 
+      </t>
+      <t>
+        The usage of the mechanism is negotiated using two new SIP header fields (Session-Expires
+        and Min-SE), a new option tag ('timer') and a new SIP response code (422). 
+      </t>
+      <section title="Problem Statement" toc="default">
+        <t>
+          1. Section 7.4 of <xref target="RFC4028"></xref> says that, in a session refresh request sent
+          within a dialog with an active session timer, the Session-Expires header field should
+          be included in the request. However, the text is unclear regarding including the
+          Session-Expires header field in a session refresh request when a negotiation of session
+          timer usage is still ongoing, e.g., if one user agent is sending a request that contains
+          a Session-Expires header field and, before it receives the associated 2xx response, receives
+          a request from the peer user agent that also contains a Session-Expires header field. Such
+          scenario might cause a glare situation, with conflicting negotiation parameters.
+        </t>
+        <t>
+          2. The absence of the Session-Expires header field in a 2xx response to an (re-)INVITE 
+          request <xref target="RFC3261"></xref> or UPDATE request <xref target="RFC3311"></xref> 
+          means that the mechanism isn't used. This can be used to reject the usage of the mechanism 
+          when sending a response. However, the text is unclear that this only applies to cases where 
+          the associated SIP request contained a Session-Expires header field.  
+        </t>
+      </section>
+      <section title="Solution" toc="default">
+        <t>
+          This document updates <xref target="RFC4028"></xref>, by clarifying the procedures for 
+          negotiating usage of the Session Initiation Protocol (SIP) <xref target="RFC3261"></xref> 
+          session timer mechanism <xref target="RFC4028"></xref>. The following clarifications are 
+          provided:
+          <list style="symbols">
+            <t>
+              A Session-Expires header field can only be included in a session refresh request if
+              there is no ongoing negotiation of usage of the session timer mechansim.
+            </t>
+            <t>
+              A user agent shall, if it receives a session request with a Session-Expires header field
+              during an ongoing negotiation of usage of the session timer mechanism, send a 491
+              (Request Pending) response to the request.
+            </t>
+            <t>
+              The absence of a Session-Expires header field in a response will disable usage of
+              the session timer mechanism only if the associated requuest contained a Session-Expires
+              header field.
+            </t>
+          </list>
+        </t>
+      </section>
+    </section>
+ 
+    <section title="Conventions">
+    <t>
+      The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT",
+      "SHOULD", "SHOULD NOT", "RECOMMENDED", "MAY", and "OPTIONAL" in this
+      document are to be interpreted as described in <xref target="RFC2119"></xref>.
+    </t>
+    </section>
+
+    <section anchor="section.rfcupdate.4028" title="Update to RFC 4028">
+      <section anchor="section.rfcupdate.4028.7-2" title="Update to Section 7.2">
+        <t>
+            This section updates the third paragraph in section 7.2 of
+            <xref target="RFC4028" pageno="false" format="default"/>, by 
+            clarifying that the absence of a Session-Expires header field in
+            a response will disable usage of the session timer mechanism only
+            if the associated request contained a Session-Expires header field.
+        </t>
+        <figure>
+          <artwork><![CDATA[
+
+OLD TEXT:
+
+   If the 2xx response did not contain a Session-Expires header field,
+   there is no session expiration. In this case, no refreshes need to
+   be sent. A 2xx without a Session-Expires can come for both initial
+   and subsequent session refresh requests. This means that the session
+   timer can be 'turned-off' in mid dialog by receiving a response
+   without a Session-Expires header field.
+
+
+NEW TEXT:
+
+   If the request contained a Session-Expires header field, and the
+   associated 2xx response did not contain a Session-Expires header
+   field, there is no session expiration. In this case, no refreshes
+   need to be sent. A 2xx without a Session-Expires can come for both
+   initial and subsequent session refresh requests. This means that
+   the session timer can be 'turned-off' in mid dialog by receiving a
+   response without a Session-Expires header field.
+
+       ]]></artwork>
+        </figure>
+      </section>
+
+      <section anchor="section.rfcupdate.4028.7-4" title="Update to Section 7.4">
+        <t>
+            This section updates the fifth paragraph in section 7.4 of
+            <xref target="RFC4028" pageno="false" format="default"/>, by 
+            clarifying that the Session-Expires header field can only be
+            included in a refresh request if there is no ongoing negotiation
+            of usage of the session timer mechanism.
+        </t>
+        <figure>
+          <artwork><![CDATA[
+
+OLD TEXT:
+
+   In a session refresh request sent within a dialog with an active
+   session timer, the Session-Expires header field SHOULD be present.
+   When present, it SHOULD be equal to the maximum of the Min-SE header
+   field (recall that its default value when not present is 90 seconds)
+   and the current session interval. Inclusion of the Session-Expires
+   header field with this value avoids certain denial-of-service
+   attacks, as documented in Section 11. As such, a UA should only
+   ignore the SHOULD in unusual and singular cases where it is 
+   desirable to change the session interval mid-dialog.
+
+
+NEW TEXT:
+
+   In a session refresh request sent within a dialog with an active
+   session timer, and when there is no ongoing negotiation of usage
+   of the session timer mechanism, the Session-Expires header field 
+   SHOULD be present. If there is an ongoing negotiation, the
+   Session-Expires header field MUST NOT be present. When present, it
+   SHOULD be equal to the maximum of the Min-SE header field (recall
+   that its default value when not present is 90 seconds) and the 
+   current session interval. Inclusion of the Session-Expires header
+   field with this value avoids certain denial-of-service attacks, as
+   documented in Section 11. As such, a UA should only ignore the 
+   SHOULD in unusual and singular cases where it is desirable to 
+   change the session interval mid-dialog.
+
+       ]]></artwork>
+        </figure>
+      </section>
+
+      <section anchor="section.rfcupdate.4028.8-1" title="Update to Section 8.1">
+        <t>
+            This section updates the second paragraph section 8.1 of <xref target="RFC4028" 
+            pageno="false" format="default"/>, by clarifying that a proxy can
+            insert a Session-Expires header field in a request only if there is 
+            no ongoing negotiation of usage of the session timer mechanism.
+        </t>
+        <figure>
+          <artwork><![CDATA[
+
+OLD TEXT:
+
+   To request a session timer for a session, a proxy makes sure that a
+   Session-Expires header field is present in a session refresh request
+   for that session. A proxy MAY insert a Session-Expires header field
+   in the request before forwarding it if none was present in the
+   request. This Session-Expires header field may contain any desired
+   expiration time the proxy would like, but not with a duration lower
+   than the value in the Min-SE header field in the request, if it is
+   present. The proxy MUST NOT include a refresher parameter in the
+   header field value.
+
+NEW TEXT:
+
+   To request a session timer for a session, a proxy makes sure that a
+   Session-Expires header field is present in a session refresh request
+   for that session. A proxy MAY insert a Session-Expires header field
+   in the request before forwarding it if none was present in the
+   request, and if there is no ongoing negotiation of usage of the
+   session timer mechanism. This Session-Expires header field may 
+   contain any desired expiration time the proxy would like, but not 
+   with a duration lower than the value in the Min-SE header field in 
+   the request, if it is present. The proxy MUST NOT include a refresher 
+   parameter in the header field value.
+
+       ]]></artwork>
+        </figure>
+      </section>
+
+      <section anchor="section.rfcupdate.4028.9" title="Update to Section 9">
+        <t>
+            This section updates section 8.1 of <xref target="RFC4028" 
+            pageno="false" format="default"/>, by clarifying that a session 
+            refresh request that is received while there is an ongoing 
+            negotiation of usage of the session timer mechanism shall be 
+            rejected by a 491 (Request Pending) response. The clarification 
+            is done by adding a new paragraph between the fouth and fifth
+            paragraphs of the section.
+        </t>
+        <figure>
+          <artwork><![CDATA[
+
+NEW TEXT:
+
+   If an incoming request contains a Session-Expires header field,
+   and there is on ongoing negotiation of usage of the session timer
+   mechanism, the UAS MUST reject the request with a 491 (Request 
+   Pending) response.
+
+       ]]></artwork>
+        </figure>
+      </section>
+    </section>
+
+    <section anchor="section.sec" title="Security considerations">
+      <t>
+        The security considerations associated with the SIP Session-Timer
+        mechanism are described in <xref target="RFC4028" pageno="false" format="default"/>.
+        This specification adds clarification text for avoiding session-timer negotiation
+        race conditions, and does not introduce new security considerations.
+      </t>
+    </section>
+    <section anchor="section.iana" title="IANA considerations">
+      <t>
+        This specification makes no requests from IANA.
+      </t>
+    </section>
+    <section title="Change log">
+      <t>
+        [RFC EDITOR NOTE: Please remove this section when publishing]
+      </t>
+      <t>
+        Changes from draft-holmberg-sipcore-sessiontimer-race-00
+        <list style="symbols">
+          <t>
+             Submission of draft-ietf-sipcore-sessiontimer-race-00
+          </t>
+        </list>
+      </t>
+    </section>
+  </middle>
+  <back>
+    <references title="Normative references">
+      <?rfc include="reference.RFC.2119"?>
+      <?rfc include="reference.RFC.3261"?>
+      <?rfc include="reference.RFC.3311"?>
+      <?rfc include="reference.RFC.4028"?>
+    </references>
+  </back>
+</rfc>
