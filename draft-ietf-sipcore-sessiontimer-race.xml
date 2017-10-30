@@ -10,7 +10,7 @@
 <?rfc subcompact="yes" ?>
 <?rfc sortrefs="no" ?>
 <?rfc strict="yes" ?>
-<rfc ipr="trust200902" category="std" docName="draft-ietf-sipcore-sessiontimer-race-00" obsoletes="" updates="4028" submissionType="IETF" xml:lang="en">
+<rfc ipr="trust200902" category="std" docName="draft-ietf-sipcore-sessiontimer-race-latest" obsoletes="" updates="4028" submissionType="IETF" xml:lang="en">
   <front>
     <title abbrev="Session timer glare">
       Session Initiation Protocol (SIP) Session Timer Glare Handling
@@ -262,19 +262,6 @@ NEW TEXT:
     <section anchor="section.iana" title="IANA considerations">
       <t>
         This specification makes no requests from IANA.
-      </t>
-    </section>
-    <section title="Change log">
-      <t>
-        [RFC EDITOR NOTE: Please remove this section when publishing]
-      </t>
-      <t>
-        Changes from draft-holmberg-sipcore-sessiontimer-race-00
-        <list style="symbols">
-          <t>
-             Submission of draft-ietf-sipcore-sessiontimer-race-00
-          </t>
-        </list>
       </t>
     </section>
   </middle>
